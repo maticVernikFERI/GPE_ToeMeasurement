@@ -110,13 +110,37 @@
             opacity: 0.9;
         }
 
+        .middle-section {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+
         .orientation-data {
             display: flex;
             flex-direction: row;
             gap: 15px;
-            margin: 20px 0;
             justify-content: center;
             flex-wrap: wrap;
+        }
+
+        .side-diff {
+            transform: rotate(90deg);
+            writing-mode: vertical-rl;
+            text-orientation: mixed;
+        }
+
+        .side-diff .diff-label {
+            writing-mode: horizontal-tb;
+            text-orientation: upright;
+        }
+
+        .side-diff .diff-value {
+            writing-mode: horizontal-tb;
+            text-orientation: upright;
         }
 
         .axis {
@@ -229,19 +253,31 @@
                 </button>
             </div>
             
-            <!-- Center orientation data -->
-            <div class="orientation-data">
-                <div class="axis compact">
-                    <div class="axis-label">Alpha (Z)</div>
-                    <div class="axis-value" id="alpha">--</div>
+            <!-- Side differences and center orientation -->
+            <div class="middle-section">
+                <div class="difference-display side-diff" id="left-diff">
+                    <div class="diff-label">Left Diff</div>
+                    <div class="diff-value" id="left-diff-value">--</div>
                 </div>
-                <div class="axis compact">
-                    <div class="axis-label">Beta (X)</div>
-                    <div class="axis-value" id="beta">--</div>
+                
+                <div class="orientation-data">
+                    <div class="axis compact">
+                        <div class="axis-label">Alpha (Z)</div>
+                        <div class="axis-value" id="alpha">--</div>
+                    </div>
+                    <div class="axis compact">
+                        <div class="axis-label">Beta (X)</div>
+                        <div class="axis-value" id="beta">--</div>
+                    </div>
+                    <div class="axis compact">
+                        <div class="axis-label">Gamma (Y)</div>
+                        <div class="axis-value" id="gamma">--</div>
+                    </div>
                 </div>
-                <div class="axis compact">
-                    <div class="axis-label">Gamma (Y)</div>
-                    <div class="axis-value" id="gamma">--</div>
+                
+                <div class="difference-display side-diff" id="right-diff">
+                    <div class="diff-label">Right Diff</div>
+                    <div class="diff-value" id="right-diff-value">--</div>
                 </div>
             </div>
             
@@ -307,6 +343,8 @@
         // Difference display elements
         const frontDiffElement = document.getElementById('front-diff-value');
         const rearDiffElement = document.getElementById('rear-diff-value');
+        const leftDiffElement = document.getElementById('left-diff-value');
+        const rightDiffElement = document.getElementById('right-diff-value');
 
         function updateStatus(message, type = 'warning') {
             statusElement.textContent = message;
@@ -335,6 +373,22 @@
                 rearDiffElement.textContent = (rearDiff >= 0 ? '+' : '') + rearDiff.toFixed(1) + '°';
             } else {
                 rearDiffElement.textContent = '--';
+            }
+
+            // Calculate left difference (FL - RL)
+            if (storedWheelAngles.fl !== null && storedWheelAngles.rl !== null) {
+                const leftDiff = storedWheelAngles.fl - storedWheelAngles.rl;
+                leftDiffElement.textContent = (leftDiff >= 0 ? '+' : '') + leftDiff.toFixed(1) + '°';
+            } else {
+                leftDiffElement.textContent = '--';
+            }
+
+            // Calculate right difference (FR - RR)
+            if (storedWheelAngles.fr !== null && storedWheelAngles.rr !== null) {
+                const rightDiff = storedWheelAngles.fr - storedWheelAngles.rr;
+                rightDiffElement.textContent = (rightDiff >= 0 ? '+' : '') + rightDiff.toFixed(1) + '°';
+            } else {
+                rightDiffElement.textContent = '--';
             }
         }
 

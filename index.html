@@ -47,8 +47,31 @@
         .wheel-row {
             display: flex;
             justify-content: space-between;
+            align-items: center;
             width: 100%;
             max-width: 320px;
+        }
+
+        .difference-display {
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            padding: 8px 12px;
+            text-align: center;
+            min-width: 80px;
+        }
+
+        .diff-label {
+            font-size: 0.7em;
+            font-weight: bold;
+            opacity: 0.8;
+            margin-bottom: 2px;
+        }
+
+        .diff-value {
+            font-size: 1.1em;
+            font-weight: bold;
+            color: #fff;
         }
 
         .wheel-btn {
@@ -196,6 +219,10 @@
                     <span id="wheel-fl-value">--</span>
                     <div class="wheel-label">FL</div>
                 </button>
+                <div class="difference-display" id="front-diff">
+                    <div class="diff-label">Front Diff</div>
+                    <div class="diff-value" id="front-diff-value">--</div>
+                </div>
                 <button class="wheel-btn" id="wheel-fr">
                     <span id="wheel-fr-value">--</span>
                     <div class="wheel-label">FR</div>
@@ -224,6 +251,10 @@
                     <span id="wheel-rl-value">--</span>
                     <div class="wheel-label">RL</div>
                 </button>
+                <div class="difference-display" id="rear-diff">
+                    <div class="diff-label">Rear Diff</div>
+                    <div class="diff-value" id="rear-diff-value">--</div>
+                </div>
                 <button class="wheel-btn" id="wheel-rr">
                     <span id="wheel-rr-value">--</span>
                     <div class="wheel-label">RR</div>
@@ -273,6 +304,10 @@
         let currentAlpha = null;
         const storedWheelAngles = { fl: null, fr: null, rl: null, rr: null };
 
+        // Difference display elements
+        const frontDiffElement = document.getElementById('front-diff-value');
+        const rearDiffElement = document.getElementById('rear-diff-value');
+
         function updateStatus(message, type = 'warning') {
             statusElement.textContent = message;
             statusElement.className = `status ${type}`;
@@ -285,6 +320,24 @@
             currentAlpha = alpha;
         }
 
+        function calculateDifferences() {
+            // Calculate front difference (FL - FR)
+            if (storedWheelAngles.fl !== null && storedWheelAngles.fr !== null) {
+                const frontDiff = storedWheelAngles.fl - storedWheelAngles.fr;
+                frontDiffElement.textContent = (frontDiff >= 0 ? '+' : '') + frontDiff.toFixed(1) + '°';
+            } else {
+                frontDiffElement.textContent = '--';
+            }
+
+            // Calculate rear difference (RL - RR)
+            if (storedWheelAngles.rl !== null && storedWheelAngles.rr !== null) {
+                const rearDiff = storedWheelAngles.rl - storedWheelAngles.rr;
+                rearDiffElement.textContent = (rearDiff >= 0 ? '+' : '') + rearDiff.toFixed(1) + '°';
+            } else {
+                rearDiffElement.textContent = '--';
+            }
+        }
+
         function storeWheelAngle(wheelKey) {
             if (currentAlpha !== null) {
                 storedWheelAngles[wheelKey] = currentAlpha;
@@ -292,6 +345,7 @@
             } else {
                 wheelValues[wheelKey].textContent = '--';
             }
+            calculateDifferences();
         }
 
         // Add click event listeners to wheel buttons
